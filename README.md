@@ -1,9 +1,8 @@
-# Supplementary Material for Syndrome Decoding with Perfect Hints
+# Syndrome Decoding with Perfect Hints
 
-This repository contains the scripts accompanying our submission.  
-It includes the source code for Algorithm 1, Algorithm 2 , a script to compute the expected cost of Algorithm 2 as well as the scripts for Integer Linear Programming.
+This repository contains the supplementary material for the submission. It includes the source code for Algorithm 1, Algorithm2, a script to compute the expected cost of Algorithm 2 as well as a script for Integer Linear Programming.
+
 ---
-
 ## Parameters
 
 The scripts take the following command-line parameters.
@@ -23,8 +22,6 @@ One of the predefined code parameter sets:
 
 Each identifier corresponds to a specific \((n, k, w)\) triple, where `n` is the code length, `k` the code dimension and `w` the error weight as defined in the paper.
 
----
-
 ### 2. Matrix form
 
 Determines how the parity-check matrix is generated:
@@ -32,7 +29,6 @@ Determines how the parity-check matrix is generated:
 - `random` – random parity-check matrix  
 - `systematic` – systematic parity-check matrix  
 
----
 
 ### 3. Step size
 
@@ -85,4 +81,4 @@ To reproduce the ILP results from the submission, run:
 ```bash
 python3 ILP.py [parameter] [matrix_form] [stepsize]
 ```
-> Note: This script requires an active Gurobi license. The license is free for academic use.
+> Note: This script requires an active Gurobi license. For academic use, the license can be obtained for free.
