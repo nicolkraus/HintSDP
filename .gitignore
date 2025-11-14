@@ -1,7 +1,4 @@
-# Ignore the specific file
 hqc_cost.py
 tests.py
-
-# Byte-compiled / optimized / DLL files
 __pycache__/
 
