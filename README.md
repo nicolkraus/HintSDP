@@ -1,6 +1,6 @@
-# Syndrome Decoding with Perfect Hints
+# Syndrome Decoding with Perfect Hints - Supplementary Material
 
-This repository contains the supplementary material for the submission. It includes the source code for Algorithm 1, Algorithm2, a script to compute the expected cost of Algorithm 2 as well as a script for Integer Linear Programming.
+This repository contains the source code for Algorithm 1, Algorithm2, a script to compute the expected cost of Algorithm 2 as well as a script to run the (Integer) Linear Program.
 
 ## Parameters
 
@@ -38,7 +38,6 @@ For example, `stepsize = 100` evaluates:
 m = 0, 100, 200, ...
 ```
 
----
 
 ## Algorithm 1
 
@@ -48,7 +47,6 @@ To reproduce the results of Algorithm 1, run:
 python3 alg1.py [parameter] [number_of_hints_m] [runs]
 ```
 
----
 
 ## Algorithm 2
 
@@ -62,7 +60,6 @@ python3 get_expected_cost.py [parameter] [matrix_form] [stepsize]
 
 > Note: This script appends its results to the precomputed dictionaries in `EXPECTED.py`, and hence overwrites our baseline results. If you wish to keep our baseline results, make a copy before running it.
 
----
 
 ### Experimental evaluation
 
@@ -71,7 +68,7 @@ To run the experiments for Algorithm 2:
 ```bash
 python3 alg2.py [parameter] [matrix_form] [stepsize] [runs]
 ```
----
+
 
 ## Integer Linear Programming (ILP)
 
