@@ -2,7 +2,6 @@
 
 This repository contains the supplementary material for the submission. It includes the source code for Algorithm 1, Algorithm2, a script to compute the expected cost of Algorithm 2 as well as a script for Integer Linear Programming.
 
----
 ## Parameters
 
 The scripts take the following command-line parameters.
