@@ -1,4 +1,4 @@
-# Syndrome Decoding with Perfect Hints - Supplementary Material
+# Syndrome Decoding with Perfect Hints
 
 This repository contains the source code for Algorithm 1, Algorithm 2, a script to compute the expected cost of Algorithm 2 as well as a script to run the (Integer) Linear Program.
 
