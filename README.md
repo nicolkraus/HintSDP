@@ -6,7 +6,7 @@ This repository contains the source code for Algorithm 1, Algorithm 2, a script 
 
 The scripts take the following command-line parameters.
 
-### 1. Parameter set
+#### Parameter set
 
 One of the predefined code parameter sets:
 
@@ -21,12 +21,20 @@ One of the predefined code parameter sets:
 
 Each identifier corresponds to a specific \((n, k, w)\) triple, where `n` is the code length, `k` the code dimension and `w` the error weight as defined in the paper.
 
-### 2. Matrix form
+#### Matrix form
 
 Determines how the parity-check matrix is generated:
 
 - `random` – random parity-check matrix  
-- `systematic` – systematic parity-check matrix  
+- `systematic` – systematic parity-check matrix
+
+#### Number of hints m
+
+Specifies how many perfect hints are provided.  Must be less than or equal to `n-k`.
+
+#### Runs
+
+Defines how many independent executions are performed. Each run uses a fresh error vector and parity-check matrix.
 
 
 ## Algorithm 1
