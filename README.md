@@ -29,16 +29,6 @@ Determines how the parity-check matrix is generated:
 - `systematic` – systematic parity-check matrix  
 
 
-### 3. Step size
-
-The increment used when iterating over the number of perfect hints \(m\).  
-For example, `stepsize = 100` evaluates:
-
-```
-m = 0, 100, 200, ...
-```
-
-
 ## Algorithm 1
 
 To reproduce the results of Algorithm 1, run:
@@ -55,10 +45,8 @@ python3 alg1.py [parameter] [number_of_hints_m] [runs]
 To compute expected costs and optimal choices of \(\alpha\):
 
 ```bash
-python3 get_expected_cost.py [parameter] [matrix_form] [stepsize]
+python3 get_expected_cost.py [parameter] [matrix_form]
 ```
-
-> Note: This script appends its results to the precomputed dictionaries in `EXPECTED.py`, and hence overwrites our baseline results. If you wish to keep our baseline results, make a copy before running it.
 
 
 ### Experimental evaluation
@@ -66,7 +54,7 @@ python3 get_expected_cost.py [parameter] [matrix_form] [stepsize]
 To run the experiments for Algorithm 2:
 
 ```bash
-python3 alg2.py [parameter] [matrix_form] [stepsize] [runs]
+python3 alg2.py [parameter] [matrix_form] [runs]
 ```
 
 
@@ -75,6 +63,6 @@ python3 alg2.py [parameter] [matrix_form] [stepsize] [runs]
 To reproduce the ILP results from the submission, run:
 
 ```bash
-python3 ILP.py [parameter] [matrix_form] [stepsize]
+python3 ILP.py [parameter] [matrix_form]
 ```
 > Note: This script requires an active Gurobi license. For academic use, the license can be obtained for free.

@@ -353,10 +353,37 @@ def parity_check(n, k, form):
     elif form == "systematic":
         return systematic_parity_check(n, k)
     
+
+# Compute the number of ways to distribute p total errors across the left and right sets
+# for fixed p, given permutations and error weights.
+def stern_denominator(perm_l, perm_r, w_l, w_r_perm, p, k):
+    res = 0
+
+    # Iterate over all possible numbers of errors assigned to the left side (i)
+    # The remaining (p - i) errors go to the right side.
+    for i in range(p + 1):
+
+        # Check feasibility: we cannot assign more errors than allowed
+        if w_l - i < 0 or w_r_perm - (p - i) < 0:
+            cur = 0  # infeasible distribution
+
+        else:
+            # Count the number of ways to choose positions for the remaining errors
+            cur = comb(perm_l, w_l - i) * comb(perm_r, w_r_perm - (p - i))
+
+        # Accumulate the total number of feasible settings
+        res += cur
+
+    # Multiply by the number of ways to have p errors in the remaining k coordinates
+    res *= comb(k, p)
+
+    return res
+
+
 # Computes the cost of Stern’s algorithm in the systematic setting.
 # Columns are chosen proportionally from the random part (size k) and the identity part (size n–k),
 # based on the expected distribution of error positions.
-def systematic_stern_cost(alpha, n, k, w, eo):
+def systematic_stern_cost(alpha, n, k, w, eo, parameter):
     w_new = w - eo # Total remaining error weight after enumerating eo coordinates
     w_r = round(w * k / n) # Expected number of error positions in the random part (size k)
     w_l = w - w_r # Expected number of error positions in the identity part (size n-k)
@@ -364,65 +391,55 @@ def systematic_stern_cost(alpha, n, k, w, eo):
     share_r = w_r_perm / w_new # Fraction of remaining weight that lies in the random part
     perm_r = round((n - k - alpha) * share_r) # Number of columns to draw from the random part (k-alpha remaining)
     perm_l = (n - k - alpha) - perm_r # Remaining columns must come from the identity part
-    get_r = w_r_perm - P_STERN # Required number of errors we must obtain from the chosen coordinates of the random part
 
-    # Case 1: Less than P_STERN errors in the random part
-    if get_r < 0 and (n - k - alpha) >= w_l:
-        cost = (
-            log2(comb(n - k, w_l))      # ways to choose identity-part errors
-            - log2(comb(n - k - alpha, w_l)) # remove alpha excluded coordinates
-        )
-
-    # Case 2: Infeasible configurations
-    elif (
+    # Case 1: Infeasible configurations
+    if (
         (n - k - alpha) < (w - eo - P_STERN)    # too few remaining coordinates
-        or (w_r_perm > perm_r and get_r >= 0)   # insufficient random-part columns to extract required errors
+        or (w_r_perm > perm_r and w_r_perm-P_STERN >= 0)   # insufficient random-part columns to extract required errors
         or (w_l > perm_l)                  # insufficient identity-part columns to extract required errors
     ):
         cost = float("inf")
 
-    # Case 3: Standard feasible cost computation
+    # Case 2: Standard feasible cost computation
     else:
-        cost = (
-            log2(comb(n - k, w_l))               # all possible error positions in identity part
-            + log2(comb(k - alpha, w_r_perm))    # all possible error positions in random part
-            - log2(comb(perm_r, get_r))          # good choices (random part)
-            - log2(comb(perm_l, w_l))            # good choices (identity part)
-            - log2(comb(k, P_STERN))             # enumeration of P_STERN error positions
+        # cost in the numerator depends on the setting as in HQC we know that w/2 errors are on the left and in McElice we need to consider all distributions
+        if parameter in HQC:
+            numerator = log2(comb(n-k,w_l)) + log2(comb(k - alpha, w_r_perm)) # all possible weight distributions
+        elif parameter in MCELIECE:
+            numerator = log2(comb(n-alpha,w_new))
+
+        cost = (  numerator  
+            - log2( 
+                sum([stern_denominator(perm_l, perm_r, w_l, w_r_perm, P_STERN-i,k) for i in range(P_STERN+1)])    # enumerate all possible error vectors of weight UP TO P_STERN and consider all possible splits into the left and right half
+            )
         )
 
-    return cost, perm_l, perm_r
+    return cost, perm_l, perm_r, w_l, w_r_perm
 
-    
+
 # Computes the cost of Stern’s algorithm in the systematic setting when all parameters are given.
 # Allows to compute the expected cost for single experiments
-def experiments_systematic_stern_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r, w_l, w_r_perm):
-    get_r = w_r_perm - P_STERN # Required number of errors we must obtain from the chosen coordinates of the random part
-    
-    # Case 1: Less than P_STERN errors in the random part
-    if get_r < 0 and (n - k - alpha) >= w_l:
-        cost = (
-            log2(comb(n - k, w_l))      # ways to choose identity-part errors
-            - log2(comb(n - k - alpha, w_l)) # remove alpha excluded coordinates
-        )
-
-    # Case 2: Infeasible configurations
-    elif (
+def experiments_systematic_stern_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r, w_l, w_r_perm, parameter):
+    # Case 1: Infeasible configurations
+    if (
         (n - k - alpha) < (w - fixed_ones - P_STERN)    # too few remaining coordinates
-        or (w_r_perm > perm_r and get_r >= 0)   # insufficient random-part columns to extract required errors
+        or (w_r_perm > perm_r and w_r_perm-P_STERN >= 0)   # insufficient random-part columns to extract required errors
         or (w_l > perm_l)                  # insufficient identity-part columns to extract required errors
     ):
-        print(w_r_perm, perm_r )
         cost = float("inf")
 
-    # Case 3: Standard feasible cost computation
+    # Case 2: Standard feasible cost computation
     else:
-        cost = (
-            log2(comb(n - k, w_l))               # all possible error positions in identity part
-            + log2(comb(k - alpha, w_r_perm))    # all possible error positions in random part
-            - log2(comb(perm_r, get_r))          # good choices (random part)
-            - log2(comb(perm_l, w_l))            # good choices (identity part)
-            - log2(comb(k, P_STERN))             # enumeration of P_STERN error positions
+        # cost in the numerator depends on the setting as in HQC we know that w/2 errors are on the left and in McElice we need to consider all distributions
+        if parameter in HQC:
+            numerator = log2(comb(n-k,w_l)) + log2(comb(k - alpha, w_r_perm)) # all possible weight distributions
+        elif parameter in MCELIECE:
+            numerator = log2(comb(n-alpha,w-fixed_ones))
+
+        cost = (  numerator  
+            - log2( 
+                sum([stern_denominator(perm_l, perm_r, w_l, w_r_perm, P_STERN-i,k) for i in range(P_STERN+1)])    # enumerate all possible error vectors of weight UP TO P_STERN and consider all possible splits into the left and right half
+            )
         )
 
     return cost

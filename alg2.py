@@ -51,7 +51,7 @@ def alg2_systematic(H, z, e, w, m, n ,k):
     # access precomputed dictionary dependent on parameter
     dict = f"{parameter}_systematic_{alg}"
     # fetch optimal alpha, expected ones and cost
-    alpha, _, _, perm_l, perm_r = globals()[dict][m]
+    alpha, _, _, perm_l, perm_r, _, _ = globals()[dict][m]
     # expected weight in the random part
     rand_weight = round(w*k/n)
 
@@ -70,25 +70,30 @@ def alg2_systematic(H, z, e, w, m, n ,k):
     w_l = int(np.sum(e[i] for i in range(n-k)))
     print(f"w_r:{w_r}, w_l:{w_l}, fixed_ones:{fixed_ones}, alpha:{alpha}")
 
-    cost = experiments_systematic_stern_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r, w_l, w_r)
+    cost = experiments_systematic_stern_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r, w_l, w_r, parameter)
 
     return cost
 
 if __name__ == "__main__":
     parameter = str(sys.argv[1]) if len(sys.argv) > 1 else "McEliece1"
     form = str(sys.argv[2]) if len(sys.argv) > 2 else "systematic"
-    stepsize = int(sys.argv[3]) if len(sys.argv) > 3 else 50
-    runs = int(sys.argv[4]) if len(sys.argv) > 4 else 1
+    runs = int(sys.argv[3]) if len(sys.argv) > 3 else 1
     alg = "stern"
 
-    print(f"parameter: {parameter}, matrix: {form}, algorithm: {alg}, stepsize: {stepsize}, runs:{runs}")
+    print(f"parameter: {parameter}, matrix: {form}, algorithm: {alg}, runs:{runs}")
 
     n, k, w = get_parameters(parameter)
+
+    # set stepsize dependent on the scheme
+    if parameter in HQC:
+        steps = list(range(0,3000,100))
+    elif parameter in MCELIECE:
+        steps = list(range(0,n-k+1,50)) + [n-k]
 
     # setup results dictionary
     results = {}
     best80percent = {}
-    steps = list(range(0,n-k+1,stepsize)) + [n-k]
+
     # increase number of hints until secret is found
     for m in steps:
         # run multiple times and average results
@@ -114,12 +119,12 @@ if __name__ == "__main__":
         cost = sum(results[m]) / len(results[m])
         best80percent[m] = sorted(results[m])[round(runs*0.8)-1]
 
-        with open(f"Alg2-{parameter}-{form}-{alg}-{stepsize}.txt", "a") as file:
+        with open(f"Alg2-{parameter}-{form}-{alg}.txt", "a") as file:
             file.write(f"({m}, 2^{cost})\n")
 
     # Find the m whose cost is 0 in 80% of the executions and write file
     poly_ms = [m for m, v in best80percent.items() if v == 0]
-    with open(f"Alg2-{parameter}-{form}-{alg}-{stepsize}.txt", "a") as file:
+    with open(f"Alg2-{parameter}-{form}-{alg}.txt", "a") as file:
         file.write(f"Poly time in 80% of the executions for {poly_ms}\n")
 
 
