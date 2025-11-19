@@ -119,6 +119,8 @@ def main():
     m = int(sys.argv[2])
     runs = int(sys.argv[3])
 
+    print(f"Simulation of Algorithm 1 for parameter set: {parameter}, number of hints: {m}, runs: {runs}")
+
     n, k, w = get_parameters(parameter)
     total_cost = 0
 
@@ -150,7 +152,7 @@ def main():
             res = attack(n, k, w, e, normed)
             if res > best:
                 best = res
-                print(f"{w - best}")
+                print(f"Best try has {w - best} missed error coordinates - 2^{log2(count)} iterations.")
 
         print(f"({m}, 2^{math.log2(count):.2f})")
         total_cost += count
