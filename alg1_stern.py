@@ -113,18 +113,20 @@ def attack(n: int, k: int, w: int, e: np.ndarray, normed: np.ndarray) -> int:
 def main():
     """Main entry point for the simulation."""
     if len(sys.argv) < 4:
-        sys.exit("Usage: ./script.py <ParameterSet> <NumHints> <NumRuns>")
+        sys.exit("Usage: ./alg1_stern.py <ParameterSet> <NumHints> <NumRuns>")
 
     parameter = sys.argv[1]
     m = int(sys.argv[2])
     runs = int(sys.argv[3])
 
-    print(f"Simulation of Algorithm 1 for parameter set: {parameter}, number of hints: {m}, runs: {runs}")
+    print(f"Simulation of Algorithm 1 (Stern) for parameter set: {parameter}, number of hints: {m}, runs: {runs}")
 
     n, k, w = get_parameters(parameter)
     total_cost = 0
 
-    for _ in range(runs):
+    for run in range(runs):
+        print(f"Run number {run+1}/{runs}")
+        # setup instance
         e = error_vec(n, w, parameter)
         H = random_parity_check(n, k)
         # compute perfect hints
@@ -147,7 +149,7 @@ def main():
 
         # Repeated attack trials
         best, count = 0, 0
-        while best < w - P_STERN:
+        while best < w - P_STERN: # P_STERN error coordinates outside the selected n-k coordinates are allowed
             count += 1
             res = attack(n, k, w, e, normed)
             if res > best:
@@ -159,7 +161,7 @@ def main():
 
     # Save average results
     avg_cost = total_cost / runs
-    with open(f"Alg1-{parameter}.txt", "a") as file:
+    with open(f"alg1-stern-{parameter}.txt", "a") as file:
         file.write(f"({m}, 2^{math.log2(avg_cost):.2f})\n")
 
 

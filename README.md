@@ -21,6 +21,8 @@ One of the predefined code parameter sets:
 
 Each identifier corresponds to a specific \((n, k, w)\) triple, where `n` is the code length, `k` the code dimension and `w` the error weight as defined in the paper.
 
+> Note: HQC parameter computations require significant resources and are best run on a server.
+
 #### Matrix form
 
 Determines how the parity-check matrix is generated:
@@ -42,7 +44,7 @@ Defines how many independent executions are performed. Each run uses a fresh err
 To reproduce the results of Algorithm 1, run:
 
 ```bash
-python3 alg1.py [parameter] [number_of_hints_m] [runs]
+python3 alg1_stern.py [parameter] [number_of_hints_m] [runs]
 ```
 
 
@@ -50,19 +52,28 @@ python3 alg1.py [parameter] [number_of_hints_m] [runs]
 
 ### Expected cost computation
 
-To compute expected costs and optimal choices of \(\alpha\):
+To compute expected costs and optimal choices of the number of fixed positions:
 
 ```bash
-python3 get_expected_cost.py [parameter] [matrix_form]
+python3 get_expected_stern.py [parameter] [matrix_form]
 ```
 
+> Note: We precomputed the expected costs and optimal number of fixed positions, so the above script does not need to be run for the experiments.
 
 ### Experimental evaluation
 
 To run the experiments for Algorithm 2:
 
 ```bash
-python3 alg2.py [parameter] [matrix_form] [runs]
+python3 alg2_stern.py [parameter] [matrix_form] [runs]
+```
+
+## Prange with Hints
+To run the experiments for Prange's algorithm with hints, change into directory `prange` and run the experiments in the same way as above for Stern:
+
+```bash
+python3 alg1_prange.py [parameter] [number_of_hints_m] [runs]
+python3 alg2_prange.py [parameter] [matrix_form] [runs]
 ```
 
 
