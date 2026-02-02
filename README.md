@@ -48,7 +48,7 @@ Defines how many independent executions are performed. Each run uses a fresh err
 To reproduce the results of Algorithm 1, run:
 
 ```bash
-python3 alg1_stern.py [parameter] [number_of_hints_m] [runs]
+python3 alg1_stern.py [parameter] [number_of_hints_m] [noise d] [runs]
 ```
 
 
@@ -59,7 +59,7 @@ python3 alg1_stern.py [parameter] [number_of_hints_m] [runs]
 To compute expected costs and optimal choices of the number of fixed positions:
 
 ```bash
-python3 get_expected_stern.py [parameter] [matrix_form]
+python3 get_expected_stern.py [parameter] [matrix_form] [noise d]
 ```
 
 > Note: We precomputed the expected costs and optimal number of fixed positions, so the above script does not need to be run for the experiments.
@@ -69,7 +69,7 @@ python3 get_expected_stern.py [parameter] [matrix_form]
 To run the experiments for Algorithm 2:
 
 ```bash
-python3 alg2_stern.py [parameter] [matrix_form] [runs]
+python3 alg2_stern.py [parameter] [matrix_form] [noise d] [runs]
 ```
 
 ## Prange with Hints
