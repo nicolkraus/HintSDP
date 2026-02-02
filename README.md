@@ -21,7 +21,7 @@ One of the predefined code parameter sets:
 
 Each identifier corresponds to a specific \((n, k, w)\) triple, where `n` is the code length, `k` the code dimension and `w` the error weight as defined in the paper.
 
-> Note: HQC parameter computations require significant resources and are best run on a server.
+> Note: Computations for HQC parameter sets require significant resources and are best run on a server.
 
 #### Matrix form
 
