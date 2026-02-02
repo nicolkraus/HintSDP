@@ -89,3 +89,12 @@ To reproduce the ILP results from the submission, run:
 python3 ILP.py [parameter] [matrix_form]
 ```
 > Note: This script requires an active Gurobi license. For academic use, the license can be obtained for free.
+
+
+## Lee-Brickell Score Decoder
+
+To reproduce the results from the submission, run:
+
+```bash
+python3 lee_brickell_score_decoder.py [parameter] [matrix_form] [noise d] [runs]
+```
