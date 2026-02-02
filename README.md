@@ -45,7 +45,7 @@ Defines how many independent executions are performed. Each run uses a fresh err
 
 ## Algorithm 1
 
-To reproduce the results of Algorithm 1, run:
+To reproduce the results of Algorithm 1 (Fig. 3), run:
 
 ```bash
 python3 alg1_stern.py [parameter] [number_of_hints_m] [noise d] [runs]
@@ -66,24 +66,31 @@ python3 get_expected_stern.py [parameter] [matrix_form] [noise d]
 
 ### Experimental evaluation
 
-To run the experiments for Algorithm 2:
+To run the experiments for Algorithm 2 (Figures 3-11):
 
 ```bash
 python3 alg2_stern.py [parameter] [matrix_form] [noise d] [runs]
 ```
 
 ## Prange with Hints
-To run the experiments for Prange's algorithm with hints, change into directory `prange` and run the experiments in the same way as above for Stern:
+To run the experiments for Prange's algorithm with hints (Figure 3), change into directory `prange` and run the experiments as follows:
 
 ```bash
 python3 alg1_prange.py [parameter] [number_of_hints_m] [runs]
 python3 alg2_prange.py [parameter] [matrix_form] [runs]
 ```
 
+## Experiments for Corollary 1
+To reproduce our experiments regarding corollary 1 (Figure 2), run:
+
+```bash
+python3 corollary1 ["mceliece","hqc"] [kappa] [success prob.]
+```
+
 
 ## Integer Linear Programming (ILP)
 
-To reproduce the ILP results from the submission, run:
+To reproduce the ILP results from the submission (vertical lines in Figures 4,5,6,7), run:
 
 ```bash
 python3 ILP.py [parameter] [matrix_form]
@@ -93,7 +100,7 @@ python3 ILP.py [parameter] [matrix_form]
 
 ## Lee-Brickell Score Decoder
 
-To reproduce the results from the submission, run:
+To reproduce the results from the submission (vertical lines in Figures 8,10), run:
 
 ```bash
 python3 lee_brickell_score_decoder.py [parameter] [matrix_form] [noise d] [runs]
