@@ -3,7 +3,7 @@
 Algorithm 2 (Prange): Derivation of optimal alpha (number of fixed positions) by computing the costs
 and taking the alpha with minimal cost for each parameter setting and hint number.
 
-Author: Nicolai Kraus
+Author: Anonymous
 Date: 2025-11-13
 License: MIT
 """

@@ -2,7 +2,7 @@
 """
 Algorithm 1 (Stern): Attack Simulation for McEliece and HQC Parameter Sets
 
-Author: Nicolai Kraus
+Author: Anonymous
 Date: 2025-11-13
 License: MIT
 """
@@ -112,14 +112,15 @@ def attack(n: int, k: int, w: int, e: np.ndarray, normed: np.ndarray) -> int:
 
 def main():
     """Main entry point for the simulation."""
-    if len(sys.argv) < 4:
-        sys.exit("Usage: ./alg1_stern.py <ParameterSet> <NumHints> <NumRuns>")
+    if len(sys.argv) < 5:
+        sys.exit("Usage: ./alg1_stern.py <ParameterSet> <NumHints> <Noiselevel d> <NumRuns>")
 
     parameter = sys.argv[1]
     m = int(sys.argv[2])
-    runs = int(sys.argv[3])
+    d = int(sys.argv[3]) # noise level leads to e ~ Binomial(2d,0.5) - d
+    runs = int(sys.argv[4])
 
-    print(f"Simulation of Algorithm 1 (Stern) for parameter set: {parameter}, number of hints: {m}, runs: {runs}")
+    print(f"Simulation of Algorithm 1 (Stern) for parameter set: {parameter}, number of hints: {m}, noise parameter d: {d} leading to noise Bin({2*d}, 0.5) - {d}, runs: {runs}")
 
     n, k, w = get_parameters(parameter)
     total_cost = 0
@@ -139,8 +140,11 @@ def main():
 
         # Define shifted binomial models
         p = 0.5
-        d0 = ShiftedBinomial(m * w, p, 0)
-        d1 = ShiftedBinomial(m * (w - 1), p, m)
+        # d0 = ShiftedBinomial(m * w, p, 0)
+        # d1 = ShiftedBinomial(m * (w - 1), p, m)
+
+        d0 = ShiftedBinomial(m * (w+2*d), p, -d*m)
+        d1 = ShiftedBinomial(m * (w - 1 + 2*d), p, -(d-1)*m)
 
         # Compute normalized probabilities
         probs = [(x[0], calc_prob(x[1], d0, d1, w, n)) for x in psis]

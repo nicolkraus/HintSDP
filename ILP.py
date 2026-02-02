@@ -2,7 +2,7 @@
 """
 Integer Linear Programming: Attack Simulation for McEliece and HQC Parameter Sets
 
-Author: Nicolai Kraus
+Author: Anonymous
 Date: 2025-11-13
 License: MIT
 """

@@ -1,6 +1,6 @@
 # Syndrome Decoding with Perfect Hints
 
-This repository contains the source code for Algorithm 1, Algorithm 2, a script to compute the expected cost of Algorithm 2 as well as a script to run the (Integer) Linear Program.
+This repository contains the source code for Algorithm 1, Algorithm 2, a script to compute the expected cost of Algorithm 2 as well as a script to run the (Integer) Linear Program and the Lee-Brickell score decoder.
 
 ## Parameters
 
@@ -33,6 +33,10 @@ Determines how the parity-check matrix is generated:
 #### Number of hints m
 
 Specifies how many perfect hints are provided.  Must be less than or equal to `n-k`.
+
+#### Noise parameter d
+
+Specifies the noise level. For each hint, a noise term e ~ Bin(2*d, 0.5)-d is sampled and added.
 
 #### Runs
 

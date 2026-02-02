@@ -188,7 +188,7 @@ def prange_cost(alpha, n, k, w, eo):
         cost = log2(comb(n - alpha, w - eo)) - log2(comb(n - k - alpha, w - eo))
     return cost
 
-def exp_num_ones(m, alpha, n, w):
+def exp_num_ones(m, alpha, n, w, d):
     """
     Estimate the expected number of ones in highest scored alpha positions.
 
@@ -202,6 +202,8 @@ def exp_num_ones(m, alpha, n, w):
         Code length.
     w : int
         Hamming weight of the error vector.
+    d : int
+        Binomial noise parameter.
 
     Returns
     -------
@@ -212,8 +214,10 @@ def exp_num_ones(m, alpha, n, w):
         return 0
 
     # Define function f(B) whose root determines the correct threshold B
-    f = lambda B: alpha - (n - w) * (1 - binom.cdf(B, m * w, 1 / 2)) \
-                  - w * (1 - binom.cdf(B - m, m * (w - 1), 1 / 2))
+    f = lambda B: alpha - (n - w) * (1 - binom.cdf(B + d * m, m * (w + 2 * d), 1 / 2)) \
+                  - w * (1 - binom.cdf(B + (d - 1) * m, m * (w - 1 + 2 * d), 1 / 2))
+    
+    # now with noise
 
     # Binary search bounds for B
     lo, hi = 0, m * w + m
@@ -230,7 +234,7 @@ def exp_num_ones(m, alpha, n, w):
     B = (lo + hi) / 2
 
     # Expected number of ones from the binomial tail probability
-    exp_num_ones = w * (1 - binom.cdf(B - m, m * (w - 1), 1 / 2))
+    exp_num_ones = w * (1 - binom.cdf(B + (d - 1) * m, m * (w - 1 + 2 * d), 1 / 2))
     return exp_num_ones
 
 
@@ -354,9 +358,30 @@ def parity_check(n, k, form):
         return systematic_parity_check(n, k)
     
 
-# Compute the number of ways to distribute p total errors across the left and right sets
-# for fixed p, given permutations and error weights.
 def stern_denominator(perm_l, perm_r, w_l, w_r_perm, p, k):
+    """
+    Compute the total number of valid error distributions with exactly p errors.
+
+    Parameters
+    ----------
+    perm_l : int
+        Number of coordinates in the left permutation.
+    perm_r : int
+        Number of coordinates in the right permutation.
+    w_l : int
+        Target weight associated with the left side.
+    w_r_perm : int
+        Target weight associated with the right side after permutation.
+    p : int
+        Total number of errors to distribute.
+    k : int
+        Number of remaining coordinates outside the left/right split.
+
+    Returns
+    -------
+    int
+        The total number of valid configurations satisfying the constraints.
+    """
     res = 0
 
     # Iterate over all possible numbers of errors assigned to the left side (i)
@@ -380,10 +405,41 @@ def stern_denominator(perm_l, perm_r, w_l, w_r_perm, p, k):
     return res
 
 
-# Computes the cost of Stern’s algorithm in the systematic setting.
-# Columns are chosen proportionally from the random part (size k) and the identity part (size n–k),
-# based on the expected distribution of error positions.
 def systematic_stern_cost(alpha, n, k, w, eo, parameter):
+    """
+    Estimate the (log2) cost of Stern’s algorithm in the systematic setting 
+    based on the expected distribution of error positions.
+
+    Parameters
+    ----------
+    alpha : int
+        Number of columns fixed.
+    n : int
+        Code length.
+    k : int
+        Code dimension.
+    w : int
+        Target total error weight.
+    eo : int
+        Number of error positions in top alpha positions.
+    parameter : object
+        Scheme identifier used to select the appropriate parameter set.
+
+    Returns
+    -------
+    tuple
+        (cost, perm_l, perm_r, w_l, w_r_perm) where:
+        - cost : float
+            Estimated complexity in log2 scale.
+        - perm_l : int
+            Number of selected columns from the identity part.
+        - perm_r : int
+            Number of selected columns from the random part.
+        - w_l : int
+            Expected error weight assigned to the identity part.
+        - w_r_perm : int
+            Expected remaining error weight in the random part.
+    """
     w_new = w - eo # Total remaining error weight after enumerating eo coordinates
     w_r = round(w * k / n) # Expected number of error positions in the random part (size k)
     w_l = w - w_r # Expected number of error positions in the identity part (size n-k)
@@ -416,9 +472,39 @@ def systematic_stern_cost(alpha, n, k, w, eo, parameter):
 
     return cost, perm_l, perm_r, w_l, w_r_perm
 
-# Computes the cost of Stern’s algorithm in the systematic setting when all parameters are given.
-# Allows to compute the expected cost for single experiments
+
 def experiments_systematic_stern_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r, w_l, w_r_perm, parameter):
+    """
+    Estimate the (log2) cost of Stern’s algorithm in the systematic setting.
+
+    Parameters
+    ----------
+    alpha : int
+        Number of columns fixed.
+    n : int
+        Code length.
+    k : int
+        Code dimension.
+    w : int
+        Target total error weight.
+    fixed_ones : int
+        Number of fixed positions.
+    perm_l : int
+        Number of selected columns from the identity part.
+    perm_r : int
+        Number of selected columns from the random part.
+    w_l : int
+            True reamining error weight in the identity part.
+    w_r_perm : int
+            True remaining error weight in the random part.
+    parameter : object
+        Scheme identifier used to select the appropriate parameter set.
+
+    Returns
+    -------
+    cost : float
+            Estimated complexity in log2 scale.
+    """
     # Case 1: Infeasible configurations
     if (
         (n - k - alpha) < (w - fixed_ones - P_STERN)    # too few remaining coordinates
@@ -444,6 +530,40 @@ def experiments_systematic_stern_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r
     return cost
 
 def systematic_prange_cost(alpha, n, k, w, eo, parameter):
+    """
+    Estimate the (log2) cost of Prange's algorithm in the systematic setting 
+    based on the expected distribution of error positions.
+
+    Parameters
+    ----------
+    alpha : int
+        Number of columns fixed.
+    n : int
+        Code length.
+    k : int
+        Code dimension.
+    w : int
+        Target total error weight.
+    eo : int
+        Number of error positions in top alpha positions.
+    parameter : object
+        Scheme identifier used to select the appropriate parameter set.
+
+    Returns
+    -------
+    tuple
+        (cost, perm_l, perm_r, w_l, w_r_perm) where:
+        - cost : float
+            Estimated complexity in log2 scale.
+        - perm_l : int
+            Number of selected columns from the identity part.
+        - perm_r : int
+            Number of selected columns from the random part.
+        - w_l : int
+            Expected error weight assigned to the identity part.
+        - w_r_perm : int
+            Expected remaining error weight in the random part.
+    """
     w_new = w - eo # Total remaining error weight after enumerating eo coordinates
     w_r = round(w * k / n) # Expected number of error positions in the random part (size k)
     w_l = w - w_r # Expected number of error positions in the identity part (size n-k)
@@ -476,6 +596,37 @@ def systematic_prange_cost(alpha, n, k, w, eo, parameter):
 
 
 def experiments_systematic_prange_cost(alpha, n, k, w, fixed_ones, perm_l, perm_r, w_l, w_r_perm, parameter):
+    """
+    Estimate the (log2) cost of Prange's algorithm in the systematic setting.
+
+    Parameters
+    ----------
+    alpha : int
+        Number of columns fixed.
+    n : int
+        Code length.
+    k : int
+        Code dimension.
+    w : int
+        Target total error weight.
+    fixed_ones : int
+        Number of fixed positions.
+    perm_l : int
+        Number of selected columns from the identity part.
+    perm_r : int
+        Number of selected columns from the random part.
+    w_l : int
+            True reamining error weight in the identity part.
+    w_r_perm : int
+            True remaining error weight in the random part.
+    parameter : object
+        Scheme identifier used to select the appropriate parameter set.
+
+    Returns
+    -------
+    cost : float
+            Estimated complexity in log2 scale.
+    """
     # Case 1: Infeasible configurations
     if (
         (n - k - alpha) < (w - fixed_ones)    # too few remaining coordinates

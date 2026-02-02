@@ -2,7 +2,7 @@
 """
 Algorithm 2 (Stern): Attack Simulation for McEliece and HQC Parameter Sets
 
-Author: Nicolai Kraus
+Author: Anonymous
 Date: 2025-11-13
 License: MIT
 """
@@ -12,16 +12,16 @@ import sys
 from helpers import *
 from EXPECTED_STERN import *
 
-def alg2(H, z, e, w, m, n ,k, form):
+def alg2(H, z, e, w, m, n ,k, form, noise):
     # select algorithm dependent on the form of the parity-check matrix
     if form == "systematic":
-        return alg2_systematic(H, z, e, w, m, n, k)
+        return alg2_systematic(H, z, e, w, m, n, k, noise)
     else:
-        return alg2_random(H, z, e, w, m, n, k)
+        return alg2_random(H, z, e, w, m, n, k, noise)
 
-def alg2_random(H, z, e, w, m, n ,k):
+def alg2_random(H, z, e, w, m, n ,k, noise):
     # access precomputed dictionary dependent on parameter
-    dict = f"{parameter}_random_{alg}"
+    dict = f"{parameter}_random_{alg}_{noise}"
     # fetch optimal alpha, expected ones and cost
     alpha, _, _ = globals()[dict][m]
 
@@ -47,9 +47,9 @@ def alg2_random(H, z, e, w, m, n ,k):
     return cost
 
 
-def alg2_systematic(H, z, e, w, m, n ,k):
+def alg2_systematic(H, z, e, w, m, n ,k, noise):
     # access precomputed dictionary dependent on parameter
-    dict = f"{parameter}_systematic_{alg}"
+    dict = f"{parameter}_systematic_{alg}_{noise}"
     # fetch optimal alpha, expected ones and cost
     alpha, _, _, perm_l, perm_r, _, _ = globals()[dict][m]
     # expected weight in the random part
@@ -74,10 +74,15 @@ def alg2_systematic(H, z, e, w, m, n ,k):
 
     return cost
 
+def bin_noise(d):
+    noise = -d + np.random.binomial(2*d, 0.5)
+    return noise
+
 if __name__ == "__main__":
     parameter = str(sys.argv[1]) if len(sys.argv) > 1 else "McEliece1"
     form = str(sys.argv[2]) if len(sys.argv) > 2 else "systematic"
-    runs = int(sys.argv[3]) if len(sys.argv) > 3 else 1
+    noise = int(sys.argv[3]) if len(sys.argv) > 3 else 64
+    runs = int(sys.argv[4]) if len(sys.argv) > 4 else 1
     alg = "stern"
 
     print(f"parameter: {parameter}, matrix: {form}, algorithm: {alg}, runs:{runs}")
@@ -86,7 +91,7 @@ if __name__ == "__main__":
 
     # set stepsize dependent on the scheme
     if parameter in HQC:
-        steps = list(range(0,3000,100))
+        steps = list(range(0,n-k+1,100)) + [n-k]
     elif parameter in MCELIECE:
         steps = list(range(0,n-k+1,50)) + [n-k]
 
@@ -104,11 +109,14 @@ if __name__ == "__main__":
             H = parity_check(n, k, form)
             # compute perfect hints
             z = H @ e
+            # add noise
+            noise_vec = [bin_noise(noise) for _ in range(n-k)]
+            z += noise_vec
             # take only m hints
             H_m = H[:m]
             z_m = z[:m]
             # run the algorithm
-            cost = alg2(H_m, z_m, e, w, m, n, k, form)
+            cost = alg2(H_m, z_m, e, w, m, n, k, form, noise)
             # write to stdout
             print(f"m: {m}, cost: 2^{cost}")
             # write to results
@@ -119,7 +127,7 @@ if __name__ == "__main__":
         cost = sum(results[m]) / len(results[m])
         best80percent[m] = sorted(results[m])[round(runs*0.8)-1]
 
-        with open(f"alg2-stern-{parameter}-{form}.txt", "a") as file:
+        with open(f"alg2-stern-{parameter}-{form}-{noise}.txt", "a") as file:
             file.write(f"({m}, 2^{cost})\n")
 
     # Find the m whose cost is 0 in 80% of the executions and write file
