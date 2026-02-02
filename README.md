@@ -45,7 +45,7 @@ Defines how many independent executions are performed. Each run uses a fresh err
 
 ## Algorithm 1
 
-To reproduce the results of Algorithm 1 (Fig. 3), run:
+Run algorithm 1 as follows:
 
 ```bash
 python3 alg1_stern.py [parameter] [number_of_hints_m] [noise d] [runs]
@@ -84,7 +84,7 @@ python3 alg2_prange.py [parameter] [matrix_form] [runs]
 To reproduce our experiments regarding corollary 1 (Figure 2), run:
 
 ```bash
-python3 corollary1 ["mceliece","hqc"] [kappa] [success prob.]
+python3 corollary1 [McEliece1,HQC1] [kappa] [success prob.]
 ```
 
 

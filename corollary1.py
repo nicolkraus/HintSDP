@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Description: Compute minimum m vs n for MRB success on McEliece or HQC instances.
 
 import numpy as np
@@ -5,7 +7,7 @@ from math import *
 import sys
 
 if __name__ == "__main__":
-	scheme = str(sys.argv[1]) if len(sys.argv) > 1 else "mceliece"
+	scheme = str(sys.argv[1]) if len(sys.argv) > 1 else "McEliece1"
 	kappa = float(sys.argv[2]) if len(sys.argv) > 2 else 0
 	succ_probability = int(sys.argv[3]) if len(sys.argv) > 3 else 90
 
@@ -18,7 +20,7 @@ if __name__ == "__main__":
 		d_str = "d_t"
 	
 	# set parameters dependent on the scheme
-	if scheme == "hqc":
+	if scheme == "HQC1":
 		omega = 132 / sqrt(18669 * 2)
 		R = 0.5
 		c_list = [1.0 + 0.1 * i for i in range(0, 16)]
@@ -28,7 +30,7 @@ if __name__ == "__main__":
 			int(omega * sqrt(1000 + (j - 1) * 1000)), 
 			int((1000 + (j - 1) * 1000) * R), int(omega * sqrt(1000 + (j - 1) * 1000)) * kappa
 		] for j in range(1, 200, 2)]
-	elif scheme == "mceliece":
+	elif scheme == "McEliece1":
 		omega = 64 / 3488 * log2(3488)
 		R = (3488 - 12 * 64) / 3488
 		c_list = [1.9 + 0.1 * i for i in range(0, 26)]
